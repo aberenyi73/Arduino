@@ -93,39 +93,39 @@ public:
     void setDitLength(const uint16_t dit);
     
 
-    inline uint16_t MorseCoder::getDitLength() const {
+    inline uint16_t getDitLength() const {
       return dit_length;
     }
 
-    inline uint16_t MorseCoder::getDahLength() const {
+    inline uint16_t getDahLength() const {
       return dah_length;
     }
 
-    inline uint16_t MorseCoder::getSpaceLength() const {
+    inline uint16_t getSpaceLength() const {
       return space_length;
     }
 
-    inline uint16_t MorseCoder::getMaxSpaceLength() const {
+    inline uint16_t getMaxSpaceLength() const {
       return max_space_length;
     }
 
-    inline uint16_t MorseCoder::getLetterSepLength() const {
+    inline uint16_t getLetterSepLength() const {
         return letter_sep_length;
     }
 
-    inline uint16_t MorseCoder::getWorSepLength() const {
+    inline uint16_t getWorSepLength() const {
         return word_sep_length;
     }
 
-    inline uint16_t MorseCoder::getMaxWorSepLength() const {
+    inline uint16_t getMaxWorSepLength() const {
         return max_word_sep_length;
     }
 
-    inline uint16_t MorseCoder::getMinWorSepLength() const {
+    inline uint16_t getMinWorSepLength() const {
         return min_word_sep_length;
     }
 
-    inline float MorseCoder::getTimeTolerance() const {
+    inline float getTimeTolerance() const {
       return time_tolerance;
     }
 

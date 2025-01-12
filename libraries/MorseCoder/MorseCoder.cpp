@@ -47,7 +47,7 @@ MORSE_CODE MORSE_CODES[MORSE_COUNT] = {mc__0, mc__1, mc__2, mc__3, mc__4, mc__5,
                               mc__U, mc__V, mc__W, mc__X, mc__Y, mc__Z};
 
 
-MorseCoder::MorseCoder(uint8_t in, uint8_t out, uint16_t dit_length = 300) : 
+MorseCoder::MorseCoder(uint8_t in, uint8_t out, uint16_t dit_length) : 
   in_pin(in), out_pin(out) {
   setDitLength(dit_length);
   setTimeTolerance(0.05f);
