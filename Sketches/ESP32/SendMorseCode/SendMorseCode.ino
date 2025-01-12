@@ -1,4 +1,4 @@
-#include <MorseCoder.h>
+#include "MorseCoder.h"
 
 /**
  * Type morse code in the Serial port and blink it on the led.
@@ -28,6 +28,7 @@ void setup() {
   // put your setup code here, to run once:
   pinMode(OUT_LED, OUTPUT);
   Serial.begin(9600);
+  delay(200);
   Serial.println("Awaiting text input.");
 }
 
@@ -38,16 +39,25 @@ void loop() {
     // wait a bit for the entire message to arrive
     String text_in = "";
     delay(100);
+    Serial.println("Reading input");
 
     while (Serial.available() > 0) {
       // display each character to the LCD
       in_char = Serial.read();
       text_in += in_char;
-      //Serial.print(in_char);
+      Serial.print(in_char);
       _signalDit();
-      delay(interval);
+      delay(10);
     }
-    Serial.println(text_in);
+    Serial.println();
+
+    if(!mc.isCleanText(text_in)) {
+      Serial.println("WARNING: The message contains unsendable characters.");
+      text_in = mc.cleanText(text_in);
+      Serial.println("   ***  Cleaned message text ***");    
+      Serial.println(text_in);
+    }
+    
     Serial.println("Awaiting text input..");
   }
 
