@@ -1,12 +1,22 @@
-/**
- * Read background light level for 2 second, sampling every 100 ms.
- */
-
+#include <LiquidCrystal.h>
+#include <LCDQueue16x2.h>
 #include <cppQueue.h>
 #include "SensorBuffer.h"
-#include "MorseCoder.h"
+#include <MorseCoder.h>
 #include "CodeBuffer.h"
 
+#define DEBUG_TEST1 false // most detailed, signal included
+#define DEBUG_TEST2 true // only code
+
+
+
+/******************** LCD SETUP CODE ********************************/
+  // Initialize the library by associating any needed LCD interface pin
+// with the arduino pin number it is connected to
+const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
+LCDQueue16x2 lq;
+/********************************************************************/
 
 
 using MState::LIGHT_LOW;
@@ -54,14 +64,41 @@ MSignal decoded = INVALID;
 
 unsigned long now;
 
+char code_char;
 
 CodeBuffer<10> codeBuffer;
+
+void writeCodeFromBuffer(CodeBuffer<10> & cb, LCDQueue16x2 & lq, LiquidCrystal * pLcd, bool addSpace = false) {
+
+  if(!cb.isEmpty()) {
+      String code = cb.getCode();
+      code_char = mc.lookupChar(code);
+      lq.push(code_char);
+      lq.write(pLcd);
+      if(DEBUG_TEST2)
+        Serial.println(code + " " + code_char);
+      cb.reset();
+      
+  }
+  if(addSpace) {
+    lq.push(' ');
+    lq.write(pLcd);
+      if(DEBUG_TEST2)
+        Serial.println();
+  }
+
+}
 
 void setup() {
   // put your setup code here, to run once:
   pinMode(OUT_LED, OUTPUT); // initialize pinout
 
   Serial.begin(9600);
+
+  // set up the LCD's number of columns and rows:
+  lcd.begin(16, 2);
+  lcd.clear();
+
   delay(200);
 
   // (IS) Establish initial state, light level
@@ -83,14 +120,9 @@ void loop() {
 
   readState = stateFromValue(sensorValue);
 
-  //Serial.println("bg:" + String(ambientLight) + " sv:" +  String(sensorValue) + " rs:" + String(readState*100));
+  if(DEBUG_TEST1)
+    Serial.println("bg:" + String(ambientLight) + " sv:" +  String(sensorValue) + " rs:" + String(readState*100));
 
-  /*Serial.print(ambientLight);
-  Serial.print(" ");
-  Serial.print(sensorValue);
-  Serial.print(" ");
-  Serial.println(readState);*/
-  
 
   // (LH) detect LOW to HIGH transition
   if(currentState == LIGHT_LOW  &&
@@ -99,7 +131,7 @@ void loop() {
     // get SPACE, LETTER_SEP or WORD_SEP from signal duration
     decoded = mc.decodeSignal(currentState, signal_duration_time);
 
-    if(DEBUG_MORSE)
+    if(DEBUG_TEST1)
       Serial.println("(LH), low signal duration: " + String(signal_duration_time) + "; decoded: " + decoded);
     
     if(decoded == MSignal::INVALID)
@@ -110,14 +142,31 @@ void loop() {
 
     } else if(decoded == MSignal::LETTER_SEP) {
       // end of letter, print letter and reset buffer
-      String code = codeBuffer.getCode();
-      Serial.println(code + " " + mc.lookupChar(code));
-      codeBuffer.reset();
+      writeCodeFromBuffer(codeBuffer, lq, &lcd);
+
+      /*if(!codeBuffer.isEmpty()) {
+        String code = codeBuffer.getCode();
+        code_char = mc.lookupChar(code);
+        lq.push(code_char);
+        lq.write(&lcd);
+        Serial.println(code + " " + code_char);
+        
+        codeBuffer.reset();
+      }*/
     } else if(decoded == MSignal::WORD_SEP) {
-      String code = codeBuffer.getCode();
-      Serial.println(code + " " + mc.lookupChar(code) + " ");
-      codeBuffer.reset();
-      Serial.println();
+      writeCodeFromBuffer(codeBuffer, lq, &lcd, true);
+
+      /*
+      if(!codeBuffer.isEmpty()) {
+        String code = codeBuffer.getCode();
+        code_char = mc.lookupChar(code);
+        lq.push(code_char);
+        lq.write(&lcd);
+        Serial.println(code + " " + code_char + " ");
+        codeBuffer.reset();
+      }
+        Serial.println();
+      */
     }
 
     // switch to LIGHT_HIGH state
@@ -130,7 +179,7 @@ void loop() {
 
     // get DIT or DAH from signal duration
     decoded = mc.decodeSignal(currentState, signal_duration_time);
-    if(DEBUG_MORSE)
+    if(DEBUG_TEST1)
       Serial.println("(HL), high signal duration: " + String(signal_duration_time) + "; decoded: " + decoded);
     
     if(decoded == MSignal::INVALID)
@@ -151,12 +200,26 @@ void loop() {
 
       // After the last (HL) transion, the buffer may have data
       // read out the buffer if not empty and print out
-      if(!codeBuffer.isEmpty() && 
-          signal_duration_time > mc) {
+
+
+      if(!codeBuffer.isEmpty() && signal_duration_time > mc.getLetterSepLength()) {
+        /*
         String code = codeBuffer.getCode();
-        Serial.println(code + " " + mc.lookupChar(code));
-        Serial.println();
+        code_char = mc.lookupChar(code);
+        lq.push(code_char);
+        lq.write(&lcd);
+
+        Serial.println(code + " " + code_char);
         codeBuffer.reset();
+        */
+        writeCodeFromBuffer(codeBuffer, lq, &lcd, (signal_duration_time > mc.getMaxWorSepLength()));
+        /*
+        if(signal_duration_time > mc.getMaxWorSepLength()) {
+          Serial.println();
+          lq.push(' ');
+          lq.write(&lcd);
+        }
+        */
       }
 
 
@@ -168,7 +231,7 @@ void loop() {
         ambientLight = buf.avg();
         last_sample_time = now;
 
-        if(DEBUG_MORSE)
+        if(DEBUG_TEST1)
           Serial.println("LOW-LOW BG sample, bg: " + String(ambientLight));
 
       }

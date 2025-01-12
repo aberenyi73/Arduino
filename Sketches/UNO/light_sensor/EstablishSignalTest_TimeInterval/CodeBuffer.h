@@ -1,15 +1,19 @@
 #ifndef CODE_BUFFER_H
 #define CODE_BUFFER_H
 
-
-
+/**
+ * Buffer class to collect DITs and DAHs during code detection.
+ */
 template <size_t BUFFER_SIZE>
 class CodeBuffer {  
-// The number of records light records to keep
-// This should be small enough to collect data in less than 10ms, which is the shortest DIT time interval.
 
 public:
+
+  // Initialize the buffer with BUFFER_SIZE empty spaces. 
+  // Slow to start, so create an instance before usage and reuse the instance.
   CodeBuffer() {
+    for(int i {0}; i < BUFFER_SIZE; i++)
+      buffer += " ";
   }
 
   // Get the buffer contents as a String.
@@ -44,9 +48,11 @@ public:
 
 
 private:
-  //char myBuffer[BUFFER_SIZE];
-  String buffer = "          ";
-  size_t current_index = 0; // the position we are writing. It can go beyond the last position, in which case it full.
+  // The String whose chars are the buffer buckets.
+  String buffer = "";
+  
+  // the position we are writing. It can go beyond the last position, in which case it full.
+  size_t current_index = 0; 
 };
 
 

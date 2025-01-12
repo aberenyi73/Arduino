@@ -1,10 +1,6 @@
 
 #include "MorseCoder.h"
 
-//const char MorseCoder::DIT = '.';
-//const char MorseCoder::DAH = '-';
-//const char MorseCoder::SPACE = ' ';
-
 
 // MORSE CODES, dit/dah array plus length
 MORSE_CODE mc__0 = {"-----", '0'};
@@ -49,6 +45,7 @@ MORSE_CODE MORSE_CODES[MORSE_COUNT] = {mc__0, mc__1, mc__2, mc__3, mc__4, mc__5,
                               mc__A, mc__B, mc__C, mc__D, mc__E, mc__F, mc__G, mc__H, mc__I, mc__J, 
                               mc__K, mc__L, mc__M, mc__N, mc__O, mc__P, mc__Q, mc__R, mc__S, mc__T, 
                               mc__U, mc__V, mc__W, mc__X, mc__Y, mc__Z};
+
 
 MorseCoder::MorseCoder(uint8_t in, uint8_t out, uint16_t dit_length = 300) : 
   in_pin(in), out_pin(out) {
@@ -215,7 +212,8 @@ MSignal MorseCoder::decodeSignal(const MState hi_low, const unsigned long signal
     // WORD_SEP, LETTER_SEP or SPACE
 
     // most of the time there will be no signal, so return quickly.
-    if(signal_duration_time >= this->getMinWorSepLength())
+    if(signal_duration_time >= min_word_sep_length &&
+       signal_duration_time <= max_word_sep_length )
       return MSignal::WORD_SEP; 
 
     // if we got a space, don't check letter

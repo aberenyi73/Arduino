@@ -1,7 +1,9 @@
+
 #ifndef SENSOR_BUFFER_H
 #define SENSOR_BUFFER_H
 
 #include <Arduino.h>
+
 
 
 // Circular buffer to hold integer sensor data and quickly calculate the average.
@@ -59,7 +61,7 @@ void SensorBuffer<BUFFER_SIZE>::fill(int (*readFunc)(int), const uint8_t IN_LIGH
   unsigned long start_time = millis();
   unsigned long end_time = start_time + 5;
   
-  for(size_t i {0}; i < BUFFER_SIZE; i++) {
+  for(int i {0}; i < BUFFER_SIZE; i++) {
     if(millis() > end_time) {
       // Serial.println("Breaking out of SensorBuffer.fill() " + String(i));
       break;
@@ -72,7 +74,7 @@ void SensorBuffer<BUFFER_SIZE>::fill(int (*readFunc)(int), const uint8_t IN_LIGH
 template <size_t BUFFER_SIZE>
 int SensorBuffer<BUFFER_SIZE>::avg(){
   int sum = myBuffer[0];
-  for(size_t i = 1; i < BUFFER_SIZE; i++) {
+  for(int i = 1; i < BUFFER_SIZE; i++) {
     sum += myBuffer[i];
   }
   return sum/BUFFER_SIZE;

@@ -11,6 +11,7 @@ struct MORSE_CODE {
   String code;
   char letter;
 };
+
 // MORSE CODES, dit/dah array plus length
 MORSE_CODE mc__0 = {"-----", '0'};
 MORSE_CODE mc__1 = {".----", '1'};

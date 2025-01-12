@@ -1,10 +1,9 @@
 #ifndef MORSE_H
 #define MORSE_H
 
-#define DEBUG_MORSE true
-
 #define MORSE_COUNT 36
 
+#define DEBUG_MORSE false
 
 #include <Arduino.h>  // Required for the Arduino String class
 
@@ -82,13 +81,12 @@ extern MORSE_CODE MORSE_CODES[MORSE_COUNT];
 class MorseCoder {
 public:
 
-    // for printing purposes, '.';
-    //static const char DIT; 
-    // for printing purposes, '-'
-    //static const char DAH;
-    // for printing purposes, ' '
-    //static const char SPACE;
-
+    /**
+     * Constructor to read and to signal morse code.
+     * @param in the input pin of the light detector
+     * @param out the output pin to flash morse code
+     * @param dit_length the time duration of a DIT, default = 300ms.
+     */
     MorseCoder(uint8_t in, uint8_t out, uint16_t dit_length = 300);
 
     // set the time duration of a dit, and all related timings
@@ -247,7 +245,5 @@ public:
 
     
 };
-
-
 
 #endif MORSE_H
